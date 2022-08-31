@@ -94,6 +94,32 @@ app.get(`/user`, async (req, res) => {
   });
 });
 
+app.get(`/places`, async (req, res) => {
+  const count = await prisma.places.count({
+    where: {
+      title: { contains: req.query.search as string },
+    },
+  });
+  const result = await prisma.places.findMany({
+    take: 10,
+    skip: (Number(req.query.skip) - 1 || 0) * 10,
+    where: {
+      title: { contains: req.query.search as string },
+    },
+    include: {
+      place_types: true,
+    },
+  });
+  res.json({
+    count: count,
+    data: JSON.parse(
+      JSON.stringify(
+        result,
+        (_, value) => (typeof value === "bigint" ? value.toString() : value) // return everything else unchanged
+      )
+    ),
+  });
+});
 // app.listen(3001, () => {
 //   console.log('listening on port 3001');
 // });
