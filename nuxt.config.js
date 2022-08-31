@@ -66,7 +66,17 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    extend(config, { isDev, isClient }) {
+      config.node = {
+        // fs: "empty",
+        // child_process: "empty",
+        // net: "empty",
+        // tls: "empty",
+        // cardinal: "empty",
+      };
+    },
+  },
   serverMiddleware: {
     "/api": "~/api",
   },
