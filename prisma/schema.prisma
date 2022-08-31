@@ -1,0 +1,429 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model activities {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title         String    @db.VarChar(255)
+  subtitle      String?   @db.VarChar(255)
+  subtitle_icon String?   @db.VarChar(255)
+  description   String?   @db.Text
+  image_url     String    @db.VarChar(255)
+  duration      String    @db.VarChar(255)
+  note          String?   @db.Text
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model attachments {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  path            String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  attachable_id   Int
+  attachable_type String    @db.VarChar(255)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model carousels {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String?   @db.VarChar(255)
+  description String?   @db.Text
+  image_url   String    @db.VarChar(255)
+  is_active   Boolean   @default(true)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model fcms {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  token      String    @db.VarChar(255)
+  user_id    BigInt?   @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fcms_user_id_foreign")
+
+  @@index([user_id], map: "fcms_user_id_foreign")
+}
+
+model massages {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title         String    @db.VarChar(255)
+  subtitle      String?   @db.VarChar(255)
+  subtitle_icon String?   @db.VarChar(255)
+  description   String?   @db.Text
+  image_url     String    @db.VarChar(255)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+}
+
+model menu_item_menu_section {
+  menu_item_id    BigInt        @db.UnsignedBigInt
+  menu_section_id BigInt        @db.UnsignedBigInt
+  menu_items      menu_items    @relation(fields: [menu_item_id], references: [id], onUpdate: Restrict, map: "menu_item_menu_section_menu_item_id_foreign")
+  menu_sections   menu_sections @relation(fields: [menu_section_id], references: [id], onUpdate: Restrict, map: "menu_item_menu_section_menu_section_id_foreign")
+
+  @@unique([menu_item_id, menu_section_id], map: "menu_item_menu_section_menu_item_id_menu_section_id_unique")
+  @@index([menu_section_id], map: "menu_item_menu_section_menu_section_id_foreign")
+}
+
+model menu_items {
+  id                     BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  title                  String                   @db.VarChar(255)
+  description            String?                  @db.Text
+  image_url              String?                  @db.VarChar(255)
+  price                  Decimal?                 @db.Decimal(8, 2)
+  created_at             DateTime?                @db.Timestamp(0)
+  updated_at             DateTime?                @db.Timestamp(0)
+  menu_item_menu_section menu_item_menu_section[]
+}
+
+model menu_menu_section {
+  menu_id         BigInt        @db.UnsignedBigInt
+  menu_section_id BigInt        @db.UnsignedBigInt
+  menus           menus         @relation(fields: [menu_id], references: [id], onUpdate: Restrict, map: "menu_menu_section_menu_id_foreign")
+  menu_sections   menu_sections @relation(fields: [menu_section_id], references: [id], onUpdate: Restrict, map: "menu_menu_section_menu_section_id_foreign")
+
+  @@unique([menu_id, menu_section_id], map: "menu_menu_section_menu_id_menu_section_id_unique")
+  @@index([menu_section_id], map: "menu_menu_section_menu_section_id_foreign")
+}
+
+model menu_restaurant {
+  restaurant_id BigInt      @db.UnsignedBigInt
+  menu_id       BigInt      @db.UnsignedBigInt
+  menus         menus       @relation(fields: [menu_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "menu_restaurant_menu_id_foreign")
+  restaurants   restaurants @relation(fields: [restaurant_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "menu_restaurant_restaurant_id_foreign")
+
+  @@unique([menu_id, restaurant_id], map: "menu_restaurant_menu_id_restaurant_id_unique")
+  @@index([restaurant_id], map: "menu_restaurant_restaurant_id_foreign")
+}
+
+model menu_sections {
+  id                     BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  title                  String                   @db.VarChar(255)
+  description            String?                  @db.VarChar(255)
+  image_url              String?                  @db.VarChar(255)
+  created_at             DateTime?                @db.Timestamp(0)
+  updated_at             DateTime?                @db.Timestamp(0)
+  menu_item_menu_section menu_item_menu_section[]
+  menu_menu_section      menu_menu_section[]
+}
+
+model menus {
+  id                BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  title             String              @db.VarChar(255)
+  description       String?             @db.Text
+  image_url         String?             @db.VarChar(255)
+  price             Decimal?            @db.Decimal(8, 2)
+  is_embedded       Boolean             @default(false)
+  created_at        DateTime?           @db.Timestamp(0)
+  updated_at        DateTime?           @db.Timestamp(0)
+  menu_menu_section menu_menu_section[]
+  menu_restaurant   menu_restaurant[]
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model model_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  model_type    String      @db.VarChar(255)
+  model_id      BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "model_has_permissions_permission_id_foreign")
+
+  @@id([permission_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_permissions_model_id_model_type_index")
+}
+
+model model_has_roles {
+  role_id    BigInt @db.UnsignedBigInt
+  model_type String @db.VarChar(255)
+  model_id   BigInt @db.UnsignedBigInt
+  roles      roles  @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "model_has_roles_role_id_foreign")
+
+  @@id([role_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_roles_model_id_model_type_index")
+}
+
+model notifications {
+  id                   BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  title                String              @db.VarChar(255)
+  body                 String?             @db.Text
+  image                String?             @db.VarChar(255)
+  type_notification_id BigInt?             @db.UnsignedBigInt
+  user_id              BigInt?             @db.UnsignedBigInt
+  sender_id            Int?
+  created_at           DateTime?           @db.Timestamp(0)
+  updated_at           DateTime?           @db.Timestamp(0)
+  type_notifications   type_notifications? @relation(fields: [type_notification_id], references: [id], onUpdate: Restrict, map: "notifications_type_notification_id_foreign")
+  users                users?              @relation(fields: [user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "notifications_user_id_foreign")
+
+  @@index([type_notification_id], map: "notifications_type_notification_id_foreign")
+  @@index([user_id], map: "notifications_user_id_foreign")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model password_resets {
+  email      String    @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model permissibles {
+  permission_id    BigInt      @db.UnsignedBigInt
+  user_id          BigInt      @db.UnsignedBigInt
+  permissible_id   Int
+  permissible_type String      @db.VarChar(255)
+  created_at       DateTime?   @db.Timestamp(0)
+  updated_at       DateTime?   @db.Timestamp(0)
+  permissions      permissions @relation(fields: [permission_id], references: [id], onUpdate: Restrict, map: "permissibles_permission_id_foreign")
+  users            users       @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "permissibles_user_id_foreign")
+
+  @@index([permission_id], map: "permissibles_permission_id_foreign")
+  @@index([user_id], map: "permissibles_user_id_foreign")
+  @@ignore
+}
+
+model permissions {
+  id                    BigInt                  @id @default(autoincrement()) @db.UnsignedBigInt
+  name                  String                  @db.VarChar(255)
+  guard_name            String                  @db.VarChar(255)
+  created_at            DateTime?               @db.Timestamp(0)
+  updated_at            DateTime?               @db.Timestamp(0)
+  model_has_permissions model_has_permissions[]
+  permissibles          permissibles[]          @ignore
+  role_has_permissions  role_has_permissions[]
+
+  @@unique([name, guard_name], map: "permissions_name_guard_name_unique")
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model place_types {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title           String    @db.VarChar(255)
+  icon            String    @db.VarChar(255)
+  isClustered     Boolean   @default(false)
+  isSubCategory   Boolean   @default(false)
+  isSuperCategory Boolean   @default(false)
+  shownItemsCap   Boolean?
+  displayAsFilter Int
+  colorValue      Int
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  places          places[]
+}
+
+model places {
+  id                BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  title             String      @db.VarChar(255)
+  description       String?     @db.Text
+  icon              String?     @db.VarChar(255)
+  latitude          Float       @default(0)
+  longitude         Float       @default(0)
+  isClusterExcluded Boolean     @default(false)
+  place_type_id     BigInt      @db.UnsignedBigInt
+  is_available      Boolean     @default(true)
+  placable_id       Int?
+  placable_type     String?     @db.VarChar(255)
+  created_at        DateTime?   @db.Timestamp(0)
+  updated_at        DateTime?   @db.Timestamp(0)
+  place_types       place_types @relation(fields: [place_type_id], references: [id], onUpdate: Restrict, map: "places_place_type_id_foreign")
+
+  @@index([place_type_id], map: "places_place_type_id_foreign")
+}
+
+model prices {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  label          String?   @db.VarChar(255)
+  current        Decimal   @db.Decimal(10, 2)
+  previous       Decimal   @db.Decimal(10, 2)
+  priceable_id   Int
+  priceable_type String    @db.VarChar(255)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+}
+
+model promotions {
+  id                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  number_of_individuals Int       @default(1)
+  number_of_adults      Int?
+  number_of_children    Int?
+  is_family_only        Boolean   @default(false)
+  description           String?   @db.Text
+  service_category_id   Int?      @db.UnsignedInt
+  promotable_id         Int
+  promotable_type       String    @db.VarChar(255)
+  created_at            DateTime? @db.Timestamp(0)
+  updated_at            DateTime? @db.Timestamp(0)
+}
+
+model restaurants {
+  id              BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  title           String            @db.VarChar(255)
+  subtitle        String?           @db.VarChar(255)
+  subtitle_icon   String?           @db.VarChar(255)
+  description     String?           @db.Text
+  image_url       String            @db.VarChar(255)
+  is_available    Boolean           @default(true)
+  created_at      DateTime?         @db.Timestamp(0)
+  updated_at      DateTime?         @db.Timestamp(0)
+  menu_restaurant menu_restaurant[]
+}
+
+model role_has_permissions {
+  permission_id BigInt      @db.UnsignedBigInt
+  role_id       BigInt      @db.UnsignedBigInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "role_has_permissions_permission_id_foreign")
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "role_has_permissions_role_id_foreign")
+
+  @@id([permission_id, role_id])
+  @@index([role_id], map: "role_has_permissions_role_id_foreign")
+}
+
+model roles {
+  id                   BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  name                 String                 @db.VarChar(255)
+  guard_name           String                 @db.VarChar(255)
+  created_at           DateTime?              @db.Timestamp(0)
+  updated_at           DateTime?              @db.Timestamp(0)
+  model_has_roles      model_has_roles[]
+  role_has_permissions role_has_permissions[]
+
+  @@unique([name, guard_name], map: "roles_name_guard_name_unique")
+}
+
+model room_amenities {
+  id                     BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  title                  String                   @db.VarChar(255)
+  icon_label             String?                  @db.VarChar(255)
+  created_at             DateTime?                @db.Timestamp(0)
+  updated_at             DateTime?                @db.Timestamp(0)
+  room_amenity_room_type room_amenity_room_type[]
+}
+
+model room_amenity_room_type {
+  room_amenity_id BigInt         @db.UnsignedBigInt
+  room_type_id    BigInt         @db.UnsignedBigInt
+  room_amenities  room_amenities @relation(fields: [room_amenity_id], references: [id], onUpdate: Restrict, map: "room_amenity_room_type_room_amenity_id_foreign")
+  room_types      room_types     @relation(fields: [room_type_id], references: [id], onUpdate: Restrict, map: "room_amenity_room_type_room_type_id_foreign")
+
+  @@unique([room_type_id, room_amenity_id], map: "room_amenity_room_type_room_type_id_room_amenity_id_unique")
+  @@index([room_amenity_id], map: "room_amenity_room_type_room_amenity_id_foreign")
+}
+
+model room_types {
+  id                     BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  title                  String                   @db.VarChar(255)
+  subtitle               String?                  @db.VarChar(255)
+  subtitle_icon          String?                  @db.VarChar(255)
+  description            String?                  @db.Text
+  image_url              String                   @db.VarChar(255)
+  created_at             DateTime?                @db.Timestamp(0)
+  updated_at             DateTime?                @db.Timestamp(0)
+  room_amenity_room_type room_amenity_room_type[]
+}
+
+model service_categories {
+  id                      BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name                    String    @db.VarChar(255)
+  description             String?   @db.Text
+  color                   Int
+  icon_label              String    @db.VarChar(255)
+  page                    String    @db.VarChar(255)
+  is_promotion_assignable Boolean   @default(false)
+  created_at              DateTime? @db.Timestamp(0)
+  updated_at              DateTime? @db.Timestamp(0)
+}
+
+model telescope_entries {
+  sequence                BigInt                   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid                    String                   @unique(map: "telescope_entries_uuid_unique") @db.Char(36)
+  batch_id                String                   @db.Char(36)
+  family_hash             String?                  @db.VarChar(255)
+  should_display_on_index Boolean                  @default(true)
+  type                    String                   @db.VarChar(20)
+  content                 String                   @db.LongText
+  created_at              DateTime?                @db.DateTime(0)
+  telescope_entries_tags  telescope_entries_tags[] @ignore
+
+  @@index([batch_id], map: "telescope_entries_batch_id_index")
+  @@index([created_at], map: "telescope_entries_created_at_index")
+  @@index([family_hash], map: "telescope_entries_family_hash_index")
+  @@index([type, should_display_on_index], map: "telescope_entries_type_should_display_on_index_index")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model telescope_entries_tags {
+  entry_uuid        String            @db.Char(36)
+  tag               String            @db.VarChar(255)
+  telescope_entries telescope_entries @relation(fields: [entry_uuid], references: [uuid], onDelete: Cascade, onUpdate: Restrict, map: "telescope_entries_tags_entry_uuid_foreign")
+
+  @@index([entry_uuid, tag], map: "telescope_entries_tags_entry_uuid_tag_index")
+  @@index([tag], map: "telescope_entries_tags_tag_index")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model telescope_monitoring {
+  tag String @db.VarChar(255)
+
+  @@ignore
+}
+
+model type_notifications {
+  id            BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  title         String          @db.VarChar(255)
+  icon          String?         @db.VarChar(255)
+  created_at    DateTime?       @db.Timestamp(0)
+  updated_at    DateTime?       @db.Timestamp(0)
+  notifications notifications[]
+}
+
+model users {
+  id                BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String          @db.VarChar(255)
+  email             String          @unique(map: "users_email_unique") @db.VarChar(255)
+  email_verified_at DateTime?       @db.Timestamp(0)
+  password          String          @db.VarChar(255)
+  remember_token    String?         @db.VarChar(100)
+  created_at        DateTime?       @db.Timestamp(0)
+  updated_at        DateTime?       @db.Timestamp(0)
+  fcms              fcms[]
+  notifications     notifications[]
+  permissibles      permissibles[]  @ignore
+}
