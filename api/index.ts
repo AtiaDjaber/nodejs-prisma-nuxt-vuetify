@@ -42,10 +42,10 @@ app.get(`/user`, async (req, res) => {
       contains: req.query.title as string,
     },
     // is_available: { equals: true },
-    created_at: {
-      gte: new Date("2022-08-30"),
-    },
-    menu_restaurant: { none: {} },
+    // created_at: {
+    //   gte: new Date("2022-08-30"),
+    // },
+    // menu_restaurant: { none: {} },
   } as Prisma.restaurantsWhereInput;
 
   const userCount = await prisma.restaurants.count({
@@ -54,9 +54,7 @@ app.get(`/user`, async (req, res) => {
   const result = await prisma.restaurants.findMany({
     take: 10,
     skip: Number(req.query.skip) || 0,
-
     where: filterRestaurant,
-
     include: {
       menu_restaurant: {
         include: {
@@ -105,9 +103,6 @@ app.get(`/places`, async (req, res) => {
     skip: (Number(req.query.skip) - 1 || 0) * 10,
     where: {
       title: { contains: req.query.search as string },
-    },
-    include: {
-      place_types: true,
     },
   });
   res.json({

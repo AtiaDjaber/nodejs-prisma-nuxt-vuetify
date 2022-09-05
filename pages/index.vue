@@ -1,22 +1,23 @@
 <template>
   <div>
     <v-text-field v-model="search"> </v-text-field>
-    <v-data-table
-      :headers="headers"
-      :items="items"
-      :items-per-page="10"
-      class="elevation-1"
-      @update:options="paginate"
-      :server-items-length="count"
-      single-select
-      :footer-props="{
-        'items-per-page-options': [10, 10],
-        'show-current-page': true,
-        'show-first-last-page': true,
-        'page-text': 'رقم الصفحة',
-        'items-per-page-text': 'عدد الأسطر',
-      }"
-    ></v-data-table>
+    <div v-resize="onResize">
+      <v-data-table
+        :headers="headers"
+        :items="items"
+        class="tab10"
+        :items-per-page="1"
+        @update:options="paginate"
+        :server-items-length="count"
+        :height="windowSize.y - 270"
+        single-select
+      >
+        <template v-slot:[`item.title`]="{ index, item }">
+          <span v-if="index !== items.length - 1">{{ item.title }}</span>
+          <span v-else v-intersect="onIntersect">{{ item.title }}</span>
+        </template>
+      </v-data-table>
+    </div>
   </div>
 </template>
 
@@ -36,11 +37,14 @@ export default class Index extends Vue {
   items = [];
   count = 0;
   page = 1;
-
+  windowSize = { x: 0, y: 0 };
   search = "";
   async getData() {
-    this.count = 0;
-    this.items = [];
+    // this.count = 0;
+    // this.items = [];
+    if (this.items.length != 0 && this.count == this.items.length) {
+      return;
+    }
     let res = await (
       await axios.get(
         "http://localhost:3000/api/places?skip=" +
@@ -49,21 +53,34 @@ export default class Index extends Vue {
           this.search
       )
     ).data;
-    this.items = res["data"];
-    console.log(res["count"]);
+
+    this.items.push(...res["data"]);
+
     this.count = res["count"];
   }
-  created() {
-    this.getData();
-  }
+  created() {}
   @Watch("search")
   onSearch() {
+    this.page = 1;
+    this.items = [];
+
     this.getData();
+  }
+  onIntersect(e) {
+    if (e[0].isIntersecting) {
+      this.page++;
+    }
   }
   @Watch("page")
   onPage() {
     this.getData();
   }
+
+  onResize() {
+    this.windowSize = { x: window.innerWidth, y: window.innerHeight };
+    console.log(this.windowSize);
+  }
+
   paginate(obj: any) {
     this.page = obj.page;
     this.getData();
