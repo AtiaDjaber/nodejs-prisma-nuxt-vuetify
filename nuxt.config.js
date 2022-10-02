@@ -31,7 +31,7 @@ export default {
     // https://go.nuxtjs.dev/typescript
     "@nuxt/typescript-build",
     // https://go.nuxtjs.dev/vuetify
-    "@nuxtjs/vuetify",
+    ["@nuxtjs/vuetify", { iconfont: "mdi" }],
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -49,8 +49,16 @@ export default {
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ["~/assets/variables.scss"],
+    defaultAssets: {
+      font: true,
+      icons: "mdi",
+    },
+    icons: {
+      iconfont: "mdi",
+    },
+    rtl: true,
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,

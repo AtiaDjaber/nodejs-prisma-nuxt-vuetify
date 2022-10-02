@@ -1,15 +1,58 @@
 <template>
   <div>
-    <v-text-field v-model="search"> </v-text-field>
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          hide-spin-buttons
+          solo
+          style="border-radius: 10px"
+          placeholder="مربع البحث ..."
+          clearable
+          hint="البحث بالاسم و اللقب"
+          flat
+        >
+        </v-text-field>
+      </v-col>
+      <v-col>
+        <v-autocomplete
+          v-model="search"
+          hide-spin-buttons
+          solo
+          item-text="title"
+          :items="items"
+          style="border-radius: 10px"
+          placeholder="مربع البحث ..."
+          clearable
+          hint="البحث بالاسم و اللقب"
+          flat
+        >
+        </v-autocomplete>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="8">
+        <v-row no-gutters class="pa-1" style="background-color: white">
+          <v-col
+            v-for="item in items"
+            v-bind:key="item.id"
+            class="pa-1"
+            cols="2"
+          >
+            <v-btn elevation="0" block color="primary">{{ item.id }}</v-btn>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
     <div v-resize="onResize">
       <v-data-table
         :headers="headers"
         :items="items"
         class="tab10"
         :items-per-page="1"
-        @update:options="paginate"
         :server-items-length="count"
-        :height="windowSize.y - 270"
+        :height="windowSize.y - 255"
         single-select
       >
         <template v-slot:[`item.title`]="{ index, item }">
@@ -45,6 +88,9 @@ export default class Index extends Vue {
     if (this.items.length != 0 && this.count == this.items.length) {
       return;
     }
+    if (this.search == null) {
+      this.search = "";
+    }
     let res = await (
       await axios.get(
         "http://localhost:3000/api/places?skip=" +
@@ -58,7 +104,9 @@ export default class Index extends Vue {
 
     this.count = res["count"];
   }
-  created() {}
+  created() {
+    this.getData();
+  }
   @Watch("search")
   onSearch() {
     this.page = 1;
@@ -81,9 +129,9 @@ export default class Index extends Vue {
     console.log(this.windowSize);
   }
 
-  paginate(obj: any) {
-    this.page = obj.page;
-    this.getData();
-  }
+  // paginate(obj: any) {
+  //   this.page = obj.page;
+  //   this.getData();
+  // }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app style="background-color: #f6f6f6">
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"

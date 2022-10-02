@@ -14,6 +14,7 @@
     "core-js": "^3.19.3",
     "express": "^4.18.1",
     "mysqldump": "^3.2.0",
+    "npm-run-all": "^4.1.5",
     "nuxt": "^2.15.8",
     "vue": "^2.6.14",
     "vue-property-decorator": "^9.1.2",
@@ -24,6 +25,7 @@
     "webpack": "^4.46.0"
   },
   "devDependencies": {
+    "@mdi/font": "^7.0.96",
     "@nuxt/types": "^2.15.8",
     "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/vuetify": "^1.12.3",

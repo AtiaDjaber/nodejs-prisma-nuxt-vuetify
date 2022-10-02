@@ -8,7 +8,7 @@ import mysqldump from "mysqldump";
 
 app.use(express.json());
 
-app.get(`/user`, async (req, res) => {
+app.get(`/`, async (req, res) => {
   var fs = require("fs");
 
   var spawn = require("child_process").spawn;
@@ -39,7 +39,7 @@ app.get(`/user`, async (req, res) => {
   //command decompress => gzip -d dumpfilename.sql.gz
   var filterRestaurant = {
     title: {
-      contains: req.query.title as string,
+      contains: req.query.title == null ? "" : (req.query.title as string),
     },
     // is_available: { equals: true },
     // created_at: {
@@ -95,7 +95,10 @@ app.get(`/user`, async (req, res) => {
 app.get(`/places`, async (req, res) => {
   const count = await prisma.places.count({
     where: {
-      title: { contains: req.query.search as string },
+      title: {
+        contains:
+          req.query.search == undefined ? "" : (req.query.search as string),
+      },
     },
   });
   const result = await prisma.places.findMany({
@@ -115,9 +118,9 @@ app.get(`/places`, async (req, res) => {
     ),
   });
 });
-// app.listen(3001, () => {
-//   console.log('listening on port 3001');
-// });
+app.listen(3001, () => {
+  console.log("listening on port 3001");
+});
 
 /**
  * logic for our api will go here
